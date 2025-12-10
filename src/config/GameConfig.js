@@ -6,6 +6,30 @@
 // Game version
 export const VERSION = '1.0.0';
 
+// Color palette
+export const COLORS = {
+    road: 0x2f2f2f,
+    roadMarking: 0xffffff,
+    sidewalk: 0x9a9a9a,
+    white: 0xffffff,
+    blue: 0x1a4d99,
+    red: 0xc62828,
+    sky: {
+        day: 0x87ceeb,
+        night: 0x0b0d1b
+    },
+    vehicle: {
+        lada: [
+            0xffffff,
+            0xb71c1c,
+            0x1e88e5,
+            0x2e7d32,
+            0xf9a825,
+            0x424242
+        ]
+    }
+};
+
 // NPC Types
 export const NPC_TYPES = {
     GOPNIK: 'gopnik',
@@ -87,6 +111,8 @@ export const CONFIG = {
         fov: 75,
         near: 0.1,
         far: 2000,
+        nearPlane: 0.1,
+        farPlane: 2000,
         thirdPersonDistance: 5,
         thirdPersonHeight: 2,
         firstPersonHeight: 1.6,
