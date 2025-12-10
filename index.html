@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ГОЙДАБЛОКС - Русский Роблокс</title>
+    <meta name="description" content="ГОЙДАБЛОКС - Русский симулятор жизни в стиле Роблокс. Водите Ладу, общайтесь с гопниками, стройте карьеру!">
+    <meta name="keywords" content="игра, россия, симулятор, роблокс, лада, гопники">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --accent-color: #f1c40f;
+            --bg-dark: #1a1a2e;
+            --bg-darker: #0f0f1a;
+            --text-light: #ffffff;
+            --text-dim: #aaaaaa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* Canvas container */
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #game-container canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-logo {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-subtitle {
+            font-size: 1.5em;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+        }
+        
+        .loading-bar-container {
+            width: 300px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        #loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        #loading-text {
+            color: var(--text-dim);
+            font-size: 0.9em;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Main Menu */
+        #main-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26,26,46,0.95) 0%, rgba(15,15,26,0.95) 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-logo {
+            font-size: 5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+        
+        .menu-subtitle {
+            font-size: 1.5em;
+            color: var(--text-dim);
+            margin-bottom: 50px;
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+        
+        .menu-btn {
+            padding: 18px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .menu-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), #c0392b);
+            color: white;
+        }
+        
+        .menu-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+        }
+        
+        .menu-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .menu-btn.secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .menu-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .menu-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .menu-version {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: var(--text-dim);
+            font-size: 0.8em;
+        }
+        
+        .menu-credits {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: var(--text-dim);
+            font-size: 0.8em;
+        }
+        
+        /* Error container */
+        .error-container {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .error-container h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        .error-container p {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+        
+        .error-container button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .loading-logo, .menu-logo {
+                font-size: 2.5em;
+            }
+            
+            .loading-subtitle, .menu-subtitle {
+                font-size: 1em;
+            }
+            
+            .menu-buttons {
+                width: 90%;
+                max-width: 300px;
+            }
+            
+            .menu-btn {
+                padding: 15px 30px;
+                font-size: 1em;
+            }
+        }
+        
+        /* Russian flag decoration */
+        .flag-decoration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to bottom, 
+                white 0%, white 33.33%, 
+                #0039a6 33.33%, #0039a6 66.66%, 
+                #d52b1e 66.66%, #d52b1e 100%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Russian flag decoration -->
+    <div class="flag-decoration"></div>
+    
+    <!-- Game Canvas Container -->
+    <div id="game-container"></div>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-logo">🏗️ ГОЙДАБЛОКС</div>
+        <div class="loading-subtitle">Русский Роблокс</div>
+        <div class="loading-bar-container">
+            <div id="loading-progress"></div>
+        </div>
+        <div id="loading-text">Загрузка...</div>
+    </div>
+    
+    <!-- Main Menu -->
+    <div id="main-menu">
+        <div class="flag-decoration"></div>
+        <div class="menu-logo">ГОЙДАБЛОКС</div>
+        <div class="menu-subtitle">Построй свой путь в суровой российской действительности!</div>
+        
+        <div class="menu-buttons">
+            <button id="new-game-btn" class="menu-btn primary">
+                🎮 Новая игра
+            </button>
+            <button id="continue-btn" class="menu-btn secondary disabled" disabled>
+                ▶️ Продолжить
+            </button>
+            <button id="load-btn" class="menu-btn secondary">
+                📂 Загрузить
+            </button>
+            <button id="settings-btn" class="menu-btn secondary">
+                ⚙️ Настройки
+            </button>
+        </div>
+        
+        <div class="menu-credits">
+            Создано с ❤️ и Three.js
+        </div>
+        <div class="menu-version">
+            v1.0.0
+        </div>
+    </div>
+    
+    <!-- Game scripts -->
+    <script type="module" src="./src/index.js"></script>
+</body>
+</html>
