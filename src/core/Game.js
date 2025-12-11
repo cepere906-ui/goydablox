@@ -96,25 +96,28 @@ export class Game {
             this.audioManager = new AudioManager(this);
             this.uiManager = new UIManager(this);
             this.economySystem = new EconomySystem(this);
+            this.vehicleManager = new VehicleManager(this);
             this.saveSystem = new SaveSystem(this);
-            
+
             // Initialize world
             this.worldGenerator = new WorldGenerator(this);
             await this.worldGenerator.generate();
-            
+
             // Initialize entities
             this.player = new Player(this);
-            this.vehicleManager = new VehicleManager(this);
             this.npcManager = new NPCManager(this);
             
             // Initialize dynamic systems
             this.questManager = new QuestManager(this);
             this.weatherSystem = new WeatherSystem(this);
             this.dayNightCycle = new DayNightCycle(this);
-            
+
+            // Keep backward compatibility with older property access patterns
+            this.syncLegacyReferences();
+
             // Setup event handlers
             this.setupEventHandlers();
-            
+
             // Load saved game if exists
             this.saveSystem.loadGame();
             
@@ -126,6 +129,21 @@ export class Game {
             console.error('❌ Failed to initialize game:', error);
             throw error;
         }
+    }
+
+    /**
+     * Expose legacy-friendly property aliases so older systems keep working
+     */
+    syncLegacyReferences() {
+        this.ui = this.uiManager;
+        this.audio = this.audioManager;
+        this.economy = this.economySystem;
+        this.quests = this.questManager;
+        this.weather = this.weatherSystem;
+        this.dayNight = this.dayNightCycle;
+        this.input = this.inputManager;
+        this.save = this.saveSystem;
+        this.statistics = this.gameState.statistics;
     }
     
     /**

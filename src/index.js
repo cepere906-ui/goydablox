@@ -242,8 +242,8 @@ function continueGame() {
  * Load game menu
  */
 function showLoadMenu() {
-    if (game?.ui) {
-        game.ui.showLoadMenu();
+    if (game?.uiManager) {
+        game.uiManager.showLoadMenu();
     }
 }
 
@@ -251,8 +251,8 @@ function showLoadMenu() {
  * Show settings menu
  */
 function showSettings() {
-    if (game?.ui) {
-        game.ui.showSettings();
+    if (game?.uiManager) {
+        game.uiManager.showSettings();
     }
 }
 

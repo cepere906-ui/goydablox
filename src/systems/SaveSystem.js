@@ -62,13 +62,13 @@ export class SaveSystem {
             
             this.lastSaveTime = Date.now();
             
-            this.game.ui?.showNotification('Игра сохранена', 'save');
+            this.game.uiManager?.showNotification('Игра сохранена', 'save');
             console.log(`Game saved to slot ${slot}`);
             
             return true;
         } catch (error) {
             console.error('Save failed:', error);
-            this.game.ui?.showNotification('Ошибка сохранения!', 'error');
+            this.game.uiManager?.showNotification('Ошибка сохранения!', 'error');
             return false;
         }
     }
@@ -82,19 +82,19 @@ export class SaveSystem {
             const saveData = saves[slot];
             
             if (!saveData) {
-                this.game.ui?.showNotification('Сохранение не найдено', 'error');
+                this.game.uiManager?.showNotification('Сохранение не найдено', 'error');
                 return false;
             }
             
             this.applySaveData(saveData);
             
-            this.game.ui?.showNotification('Игра загружена', 'save');
+            this.game.uiManager?.showNotification('Игра загружена', 'save');
             console.log(`Game loaded from slot ${slot}`);
             
             return true;
         } catch (error) {
             console.error('Load failed:', error);
-            this.game.ui?.showNotification('Ошибка загрузки!', 'error');
+            this.game.uiManager?.showNotification('Ошибка загрузки!', 'error');
             return false;
         }
     }
@@ -110,24 +110,24 @@ export class SaveSystem {
             
             // Player data
             player: this.game.player?.save() || null,
-            
+
             // Economy
-            economy: this.game.economy?.save() || null,
-            
+            economy: this.game.economySystem?.save() || null,
+
             // Quests
-            quests: this.game.quests?.save() || null,
-            
+            quests: this.game.questManager?.save() || null,
+
             // Day/Night cycle
-            dayNight: this.game.dayNight?.save() || null,
-            
+            dayNight: this.game.dayNightCycle?.save() || null,
+
             // Weather
-            weather: this.game.weather?.save() || null,
+            weather: this.game.weatherSystem?.save() || null,
             
             // Vehicles
             vehicles: this.saveVehicles(),
             
             // Statistics
-            statistics: this.game.statistics || null,
+            statistics: this.game.gameState?.statistics || null,
             
             // Settings
             settings: this.saveSettings()
@@ -146,23 +146,23 @@ export class SaveSystem {
         }
         
         // Load economy
-        if (saveData.economy && this.game.economy) {
-            this.game.economy.load(saveData.economy);
+        if (saveData.economy && this.game.economySystem) {
+            this.game.economySystem.load(saveData.economy);
         }
         
         // Load quests
-        if (saveData.quests && this.game.quests) {
-            this.game.quests.load(saveData.quests);
+        if (saveData.quests && this.game.questManager) {
+            this.game.questManager.load(saveData.quests);
         }
         
         // Load day/night
-        if (saveData.dayNight && this.game.dayNight) {
-            this.game.dayNight.load(saveData.dayNight);
+        if (saveData.dayNight && this.game.dayNightCycle) {
+            this.game.dayNightCycle.load(saveData.dayNight);
         }
         
         // Load weather
-        if (saveData.weather && this.game.weather) {
-            this.game.weather.load(saveData.weather);
+        if (saveData.weather && this.game.weatherSystem) {
+            this.game.weatherSystem.load(saveData.weather);
         }
         
         // Load vehicles
@@ -172,7 +172,7 @@ export class SaveSystem {
         
         // Load statistics
         if (saveData.statistics) {
-            this.game.statistics = saveData.statistics;
+            this.game.gameState.statistics = saveData.statistics;
         }
         
         // Load settings
@@ -229,9 +229,9 @@ export class SaveSystem {
      */
     saveSettings() {
         return {
-            musicVolume: this.game.audio?.musicVolume || 0.5,
-            sfxVolume: this.game.audio?.sfxVolume || 0.7,
-            mouseSensitivity: this.game.input?.mouseSensitivity || 0.002,
+            musicVolume: this.game.audioManager?.musicVolume || 0.5,
+            sfxVolume: this.game.audioManager?.sfxVolume || 0.7,
+            mouseSensitivity: this.game.inputManager?.mouseSensitivity || 0.002,
             graphicsQuality: this.game.graphicsQuality || 'medium',
             fullscreen: document.fullscreenElement !== null
         };
@@ -309,7 +309,7 @@ export class SaveSystem {
             delete saves[slot];
             localStorage.setItem(SAVE_KEY, JSON.stringify(saves));
             
-            this.game.ui?.showNotification('Сохранение удалено', 'save');
+            this.game.uiManager?.showNotification('Сохранение удалено', 'save');
             return true;
         } catch (error) {
             console.error('Delete failed:', error);
@@ -323,7 +323,7 @@ export class SaveSystem {
     clearAllSaves() {
         try {
             localStorage.removeItem(SAVE_KEY);
-            this.game.ui?.showNotification('Все сохранения удалены', 'save');
+            this.game.uiManager?.showNotification('Все сохранения удалены', 'save');
             return true;
         } catch (error) {
             console.error('Clear failed:', error);
@@ -367,11 +367,11 @@ export class SaveSystem {
             saves[slot] = saveData;
             localStorage.setItem(SAVE_KEY, JSON.stringify(saves));
             
-            this.game.ui?.showNotification('Сохранение импортировано', 'save');
+            this.game.uiManager?.showNotification('Сохранение импортировано', 'save');
             return true;
         } catch (error) {
             console.error('Import failed:', error);
-            this.game.ui?.showNotification('Ошибка импорта!', 'error');
+            this.game.uiManager?.showNotification('Ошибка импорта!', 'error');
             return false;
         }
     }
