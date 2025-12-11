@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import { CONFIG, COLORS } from '../config/GameConfig.js';
+import { CONFIG } from '../config/GameConfig.js';
 import { InputManager } from './InputManager.js';
 import { PhysicsEngine } from '../physics/PhysicsEngine.js';
 import { Player } from '../entities/Player.js';
@@ -18,6 +18,15 @@ import { EconomySystem } from '../systems/EconomySystem.js';
 import { WeatherSystem } from '../systems/WeatherSystem.js';
 import { DayNightCycle } from '../systems/DayNightCycle.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
+
+// Default colors
+const COLORS = {
+    sky: {
+        day: 0x87CEEB,
+        night: 0x0a0a2e,
+        sunset: 0xFF7700
+    }
+};
 
 export class Game {
     constructor() {
@@ -147,8 +156,8 @@ export class Game {
         this.scene.background = new THREE.Color(COLORS.sky.day);
         this.scene.fog = new THREE.Fog(
             COLORS.sky.day,
-            CONFIG.world.fogNear,
-            CONFIG.world.fogFar
+            CONFIG.graphics.fogNear || 100,
+            CONFIG.graphics.fogFar || 500
         );
     }
     
@@ -159,8 +168,8 @@ export class Game {
         this.camera = new THREE.PerspectiveCamera(
             CONFIG.camera.fov,
             window.innerWidth / window.innerHeight,
-            CONFIG.camera.nearPlane,
-            CONFIG.camera.farPlane
+            CONFIG.camera.near,
+            CONFIG.camera.far
         );
         this.camera.position.set(0, 10, 20);
     }

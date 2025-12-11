@@ -23,11 +23,11 @@ export class LadaVehicle {
         
         // Vehicle properties
         this.color = options.color || 0x1A5C1A;
-        this.maxSpeed = CONFIG.vehicle.lada.maxSpeed;
-        this.acceleration = CONFIG.vehicle.lada.acceleration;
-        this.braking = CONFIG.vehicle.lada.braking;
-        this.turnSpeed = CONFIG.vehicle.lada.turnSpeed;
-        this.friction = CONFIG.vehicle.lada.friction;
+        this.maxSpeed = CONFIG.vehicle.maxSpeed;
+        this.acceleration = CONFIG.vehicle.acceleration;
+        this.braking = CONFIG.vehicle.brakeForce;
+        this.turnSpeed = CONFIG.vehicle.turnSpeed;
+        this.friction = CONFIG.vehicle.friction;
         
         // State
         this.driver = null;
@@ -56,7 +56,7 @@ export class LadaVehicle {
                 type: 'box',
                 halfSize: new THREE.Vector3(1, 0.8, 2.2)
             },
-            mass: CONFIG.vehicle.lada.mass,
+            mass: 1200, // kg - typical Lada mass
             noGravity: false
         };
         

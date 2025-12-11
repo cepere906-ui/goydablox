@@ -32,9 +32,9 @@ export class VehicleManager {
                 });
                 break;
                 
-            case VEHICLE_TYPES.LADA_GRANTA:
+            case VEHICLE_TYPES.LADA_2109:
                 vehicle = new LadaVehicle(this.game, {
-                    model: 'granta',
+                    model: '2109',
                     position: position,
                     rotation: rotation,
                     color: COLORS.vehicle.lada[Math.floor(Math.random() * COLORS.vehicle.lada.length)]

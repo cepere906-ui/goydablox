@@ -921,7 +921,7 @@ export class UIManager {
      * Update FPS display
      */
     updateFPS(fps) {
-        if (CONFIG.ui.showFPS) {
+        if (CONFIG.debug?.showFPS) {
             this.fpsDisplay.textContent = `FPS: ${fps}`;
             this.fpsDisplay.style.display = 'block';
         } else {

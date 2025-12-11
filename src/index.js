@@ -48,6 +48,13 @@ async function init() {
             return;
         }
         
+        // Get container element
+        const container = document.getElementById('game-container');
+        if (!container) {
+            showError('Контейнер игры не найден!');
+            return;
+        }
+        
         // Update loading progress
         updateLoadingProgress(10, 'Инициализация Three.js...');
         
@@ -56,8 +63,8 @@ async function init() {
         
         updateLoadingProgress(30, 'Загрузка мира...');
         
-        // Initialize game
-        await game.init();
+        // Initialize game with container
+        await game.init(container);
         
         updateLoadingProgress(70, 'Создание игрока...');
         
@@ -65,6 +72,11 @@ async function init() {
         setupEventListeners();
         
         updateLoadingProgress(90, 'Финальная подготовка...');
+        
+        // Small delay to ensure everything is ready
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        updateLoadingProgress(100, 'Готово!');
         
         // Hide loading screen and show main menu
         await hideLoadingScreen();
@@ -100,6 +112,7 @@ function showLoadingScreen() {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
         loadingScreen.style.display = 'flex';
+        loadingScreen.style.opacity = '1';
     }
 }
 
@@ -110,6 +123,7 @@ async function hideLoadingScreen() {
     return new Promise(resolve => {
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
+            loadingScreen.style.transition = 'opacity 0.5s ease';
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
@@ -161,10 +175,14 @@ function showMainMenu() {
     if (mainMenu) {
         mainMenu.style.display = 'flex';
         mainMenu.style.opacity = '0';
-        setTimeout(() => {
-            mainMenu.style.opacity = '1';
-        }, 100);
+        // Trigger reflow
+        mainMenu.offsetHeight;
+        mainMenu.style.transition = 'opacity 0.3s ease';
+        mainMenu.style.opacity = '1';
     }
+    
+    // Update continue button state
+    updateContinueButton();
 }
 
 /**
@@ -173,10 +191,27 @@ function showMainMenu() {
 function hideMainMenu() {
     const mainMenu = document.getElementById('main-menu');
     if (mainMenu) {
+        mainMenu.style.transition = 'opacity 0.3s ease';
         mainMenu.style.opacity = '0';
         setTimeout(() => {
             mainMenu.style.display = 'none';
         }, 300);
+    }
+}
+
+/**
+ * Update continue button based on save existence
+ */
+function updateContinueButton() {
+    const continueBtn = document.getElementById('continue-btn');
+    if (continueBtn && game?.saveSystem) {
+        if (game.saveSystem.hasSave(0)) {
+            continueBtn.disabled = false;
+            continueBtn.classList.remove('disabled');
+        } else {
+            continueBtn.disabled = true;
+            continueBtn.classList.add('disabled');
+        }
     }
 }
 
@@ -187,7 +222,7 @@ function startNewGame() {
     hideMainMenu();
     
     if (game) {
-        game.newGame();
+        // Reset game state if needed
         game.start();
     }
 }
@@ -228,7 +263,7 @@ function setupEventListeners() {
     // Window resize
     window.addEventListener('resize', () => {
         if (game) {
-            game.onResize();
+            game.onWindowResize();
         }
     });
     
@@ -241,11 +276,9 @@ function setupEventListeners() {
     
     // Visibility change - pause when tab hidden
     document.addEventListener('visibilitychange', () => {
-        if (game) {
+        if (game && game.isRunning) {
             if (document.hidden) {
                 game.pause();
-            } else {
-                game.resume();
             }
         }
     });
@@ -290,15 +323,6 @@ function setupMenuButtons() {
     
     if (continueBtn) {
         continueBtn.addEventListener('click', continueGame);
-        
-        // Enable/disable based on save existence
-        if (game?.saveSystem?.hasSave(0)) {
-            continueBtn.disabled = false;
-            continueBtn.classList.remove('disabled');
-        } else {
-            continueBtn.disabled = true;
-            continueBtn.classList.add('disabled');
-        }
     }
     
     if (loadBtn) {

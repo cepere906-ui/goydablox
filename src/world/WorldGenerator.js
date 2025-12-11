@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import { CONFIG, COLORS, BUILDING_TYPES, VEHICLE_TYPES } from '../config/GameConfig.js';
+import { CONFIG, BUILDING_TYPES, VEHICLE_TYPES } from '../config/GameConfig.js';
 import { BuildingFactory } from './BuildingFactory.js';
 import { RoadNetwork } from './RoadNetwork.js';
 import { EnvironmentObjects } from './EnvironmentObjects.js';
@@ -672,7 +672,7 @@ export class WorldGenerator {
         
         const vehicleTypes = [
             VEHICLE_TYPES.LADA_2107,
-            VEHICLE_TYPES.LADA_GRANTA,
+            VEHICLE_TYPES.LADA_2109,
             VEHICLE_TYPES.LADA_NIVA
         ];
         

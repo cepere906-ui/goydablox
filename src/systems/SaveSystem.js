@@ -3,6 +3,7 @@
  * Handles game state persistence using localStorage
  */
 
+import * as THREE from 'three';
 import { CONFIG } from '../config/GameConfig.js';
 
 const SAVE_KEY = 'goydablox_save';

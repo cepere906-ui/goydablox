@@ -46,12 +46,12 @@ export class Player {
             velocity: this.velocity,
             collider: {
                 type: 'capsule',
-                radius: CONFIG.player.radius,
+                radius: CONFIG.player.width / 2,
                 height: CONFIG.player.height,
                 halfSize: new THREE.Vector3(
-                    CONFIG.player.radius,
+                    CONFIG.player.width / 2,
                     CONFIG.player.height / 2,
-                    CONFIG.player.radius
+                    CONFIG.player.width / 2
                 )
             },
             mass: 80,
@@ -298,7 +298,7 @@ export class Player {
         
         // Calculate camera position
         const camera = this.game.camera;
-        const playerCenter = this.position.clone().add(new THREE.Vector3(0, CONFIG.player.cameraHeight, 0));
+        const playerCenter = this.position.clone().add(new THREE.Vector3(0, CONFIG.player.eyeHeight, 0));
         
         if (this.cameraMode === 'firstPerson') {
             // First person - camera at eye level
@@ -446,7 +446,7 @@ export class Player {
     findNearestInteractable() {
         const interactables = this.game.worldGenerator?.getInteractables() || [];
         let nearest = null;
-        let nearestDist = CONFIG.player.interactionDistance;
+        let nearestDist = CONFIG.player.interactDistance;
         
         for (const obj of interactables) {
             const dist = this.position.distanceTo(obj.position);
