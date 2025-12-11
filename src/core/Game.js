@@ -96,15 +96,15 @@ export class Game {
             this.audioManager = new AudioManager(this);
             this.uiManager = new UIManager(this);
             this.economySystem = new EconomySystem(this);
+            this.vehicleManager = new VehicleManager(this);
             this.saveSystem = new SaveSystem(this);
-            
+
             // Initialize world
             this.worldGenerator = new WorldGenerator(this);
             await this.worldGenerator.generate();
-            
+
             // Initialize entities
             this.player = new Player(this);
-            this.vehicleManager = new VehicleManager(this);
             this.npcManager = new NPCManager(this);
             
             // Initialize dynamic systems
