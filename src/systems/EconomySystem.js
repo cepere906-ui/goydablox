@@ -91,14 +91,14 @@ export class EconomySystem {
         });
         
         // Update UI
-        this.game.ui?.updateMoney(this.money);
-        this.game.ui?.showMoneyChange(amount, true);
+        this.game.uiManager?.updateMoney(this.money);
+        this.game.uiManager?.showMoneyChange(amount, true);
         
         // Play sound
         if (amount >= 10000) {
-            this.game.audio?.playSound('money_big');
+            this.game.audioManager?.playSound('money_big');
         } else {
-            this.game.audio?.playSound('money');
+            this.game.audioManager?.playSound('money');
         }
         
         // Check achievements
@@ -112,8 +112,8 @@ export class EconomySystem {
      */
     spendMoney(amount, reason = 'unknown') {
         if (this.money < amount) {
-            this.game.ui?.showNotification('Недостаточно денег!', 'error');
-            this.game.audio?.playSound('error');
+            this.game.uiManager?.showNotification('Недостаточно денег!', 'error');
+            this.game.audioManager?.playSound('error');
             return false;
         }
         
@@ -128,8 +128,8 @@ export class EconomySystem {
         });
         
         // Update UI
-        this.game.ui?.updateMoney(this.money);
-        this.game.ui?.showMoneyChange(-amount, false);
+        this.game.uiManager?.updateMoney(this.money);
+        this.game.uiManager?.showMoneyChange(-amount, false);
         
         return true;
     }
@@ -165,7 +165,7 @@ export class EconomySystem {
         // Add to inventory
         this.inventory[itemId] = (this.inventory[itemId] || 0) + quantity;
         
-        this.game.ui?.showNotification(`Куплено: ${this.getItemName(itemId)} x${quantity}`, 'purchase');
+        this.game.uiManager?.showNotification(`Куплено: ${this.getItemName(itemId)} x${quantity}`, 'purchase');
         
         return true;
     }
@@ -175,7 +175,7 @@ export class EconomySystem {
      */
     sellItem(itemId, quantity = 1) {
         if (!this.inventory[itemId] || this.inventory[itemId] < quantity) {
-            this.game.ui?.showNotification('Нет товара для продажи!', 'error');
+            this.game.uiManager?.showNotification('Нет товара для продажи!', 'error');
             return false;
         }
         
@@ -193,8 +193,8 @@ export class EconomySystem {
         this.addMoney(sellPrice, `sell_${itemId}`);
         
         // Update quest stats
-        if (this.game.quests) {
-            this.game.quests.stats.itemsSold += quantity;
+        if (this.game.questManager) {
+            this.game.questManager.stats.itemsSold += quantity;
         }
         
         return true;
@@ -221,7 +221,7 @@ export class EconomySystem {
             upgrades: []
         });
         
-        this.game.ui?.showNotification(`Куплено: ${this.getVehicleName(vehicleId)}!`, 'purchase');
+        this.game.uiManager?.showNotification(`Куплено: ${this.getVehicleName(vehicleId)}!`, 'purchase');
         
         return true;
     }
@@ -245,7 +245,7 @@ export class EconomySystem {
             purchaseDate: Date.now()
         });
         
-        this.game.ui?.showNotification(`Куплено: ${this.getPropertyName(propertyId)}!`, 'purchase');
+        this.game.uiManager?.showNotification(`Куплено: ${this.getPropertyName(propertyId)}!`, 'purchase');
         
         return true;
     }
@@ -257,14 +257,14 @@ export class EconomySystem {
         const maxLoan = 1000000;
         
         if (this.debt + amount > maxLoan) {
-            this.game.ui?.showNotification('Слишком большой долг!', 'error');
+            this.game.uiManager?.showNotification('Слишком большой долг!', 'error');
             return false;
         }
         
         this.debt += amount;
         this.addMoney(amount, 'loan');
         
-        this.game.ui?.showNotification(`Взят кредит: ${this.formatMoney(amount)}`, 'warning');
+        this.game.uiManager?.showNotification(`Взят кредит: ${this.formatMoney(amount)}`, 'warning');
         
         return true;
     }
@@ -283,7 +283,7 @@ export class EconomySystem {
         
         this.debt -= amount;
         
-        this.game.ui?.showNotification(`Долг уменьшен на ${this.formatMoney(amount)}`, 'success');
+        this.game.uiManager?.showNotification(`Долг уменьшен на ${this.formatMoney(amount)}`, 'success');
         
         return true;
     }
@@ -298,7 +298,7 @@ export class EconomySystem {
             earnings: 0
         };
         
-        this.game.ui?.showNotification(`Вы начали работу: ${this.getJobName(jobId)}`, 'job');
+        this.game.uiManager?.showNotification(`Вы начали работу: ${this.getJobName(jobId)}`, 'job');
     }
     
     /**
@@ -310,7 +310,7 @@ export class EconomySystem {
         const earnings = this.currentJob.earnings;
         this.addMoney(earnings, `job_${this.currentJob.id}`);
         
-        this.game.ui?.showNotification(`Заработок: ${this.formatMoney(earnings)}`, 'job');
+        this.game.uiManager?.showNotification(`Заработок: ${this.formatMoney(earnings)}`, 'job');
         
         const job = this.currentJob;
         this.currentJob = null;
@@ -324,7 +324,7 @@ export class EconomySystem {
     addJobEarnings(amount) {
         if (this.currentJob) {
             this.currentJob.earnings += amount;
-            this.game.ui?.showNotification(`+${this.formatMoney(amount)}`, 'job');
+            this.game.uiManager?.showNotification(`+${this.formatMoney(amount)}`, 'job');
         }
     }
     
@@ -345,7 +345,7 @@ export class EconomySystem {
         if (this.debt > 0) {
             const interest = Math.floor(this.debt * this.debtInterest);
             this.debt += interest;
-            this.game.ui?.showNotification(`Начислены проценты: ${this.formatMoney(interest)}`, 'warning');
+            this.game.uiManager?.showNotification(`Начислены проценты: ${this.formatMoney(interest)}`, 'warning');
         }
         
         // Collect rent from properties
@@ -490,7 +490,7 @@ export class EconomySystem {
         this.transactions = data.transactions || [];
         
         // Update UI
-        this.game.ui?.updateMoney(this.money);
+        this.game.uiManager?.updateMoney(this.money);
     }
 }
 
