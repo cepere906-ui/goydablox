@@ -1,0 +1,356 @@
+/* ==================== ГЛАВНОЕ МЕНЮ ==================== */
+#main-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(10, 10, 26, 0.95), rgba(26, 26, 58, 0.95));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9000;
+}
+
+.menu-content {
+    text-align: center;
+}
+
+.menu-title {
+    font-size: 6em;
+    font-weight: 900;
+    margin-bottom: 60px;
+    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #ff6b6b);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+    text-shadow: 0 0 60px rgba(255, 255, 255, 0.2);
+    letter-spacing: 10px;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-version {
+    margin-top: 50px;
+    color: #555;
+    font-size: 1em;
+    letter-spacing: 2px;
+}
+
+/* ==================== МЕНЮ ПАУЗЫ ==================== */
+#pause-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 8000;
+    backdrop-filter: blur(10px);
+}
+
+.pause-content {
+    text-align: center;
+    background: rgba(20, 20, 40, 0.9);
+    padding: 50px 80px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pause-content h2 {
+    font-size: 3em;
+    margin-bottom: 40px;
+    color: #feca57;
+}
+
+.pause-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* ==================== НАСТРОЙКИ ==================== */
+#settings-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 8500;
+    backdrop-filter: blur(10px);
+}
+
+.settings-content {
+    background: rgba(20, 20, 40, 0.95);
+    padding: 40px 60px;
+    border-radius: 20px;
+    min-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-header h2 {
+    font-size: 2em;
+    color: #feca57;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section h3 {
+    color: #48dbfb;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.setting-row label {
+    color: #ccc;
+}
+
+.setting-row select,
+.setting-row input[type="range"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 8px 15px;
+    color: white;
+    cursor: pointer;
+}
+
+.setting-row input[type="range"] {
+    width: 150px;
+    -webkit-appearance: none;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.setting-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+}
+
+.setting-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+#settings-apply {
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* ==================== МАГАЗИН ==================== */
+#shop-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 7000;
+    backdrop-filter: blur(10px);
+}
+
+.shop-content {
+    background: rgba(20, 20, 40, 0.95);
+    padding: 30px 40px;
+    border-radius: 20px;
+    min-width: 600px;
+    max-height: 80vh;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-header h2 {
+    color: #feca57;
+    font-size: 1.8em;
+}
+
+.shop-items {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.shop-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.shop-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.shop-item-icon {
+    font-size: 2em;
+    margin-right: 15px;
+}
+
+.shop-item-info {
+    flex: 1;
+}
+
+.shop-item-name {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.shop-item-desc {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.shop-item-price {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #00ff88;
+}
+
+.shop-item-price.expensive {
+    color: #ff6b6b;
+}
+
+.shop-footer {
+    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #888;
+}
+
+.shop-footer strong {
+    color: #00ff88;
+    font-size: 1.2em;
+}
+
+/* ==================== ИНВЕНТАРЬ ==================== */
+#inventory-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 7000;
+    backdrop-filter: blur(10px);
+}
+
+.inventory-content {
+    background: rgba(20, 20, 40, 0.95);
+    padding: 30px 40px;
+    border-radius: 20px;
+    min-width: 500px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inventory-header h2 {
+    color: #feca57;
+    font-size: 1.8em;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+}
+
+.inventory-slot {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8em;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.inventory-slot:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.inventory-slot.empty {
+    opacity: 0.5;
+}
+
+.inventory-slot .item-count {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 0.5em;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1px 4px;
+    border-radius: 3px;
+}

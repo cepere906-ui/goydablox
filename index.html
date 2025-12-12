@@ -2,339 +2,264 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ГОЙДАБЛОКС - Русский Роблокс</title>
-    <meta name="description" content="ГОЙДАБЛОКС - Русский симулятор жизни в стиле Роблокс. Водите Ладу, общайтесь с гопниками, стройте карьеру!">
-    <meta name="keywords" content="игра, россия, симулятор, роблокс, лада, гопники">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГОЙДАБЛОКС - Симулятор жизни в России</title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/dialogs.css">
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary-color: #e74c3c;
-            --secondary-color: #3498db;
-            --accent-color: #f1c40f;
-            --bg-dark: #1a1a2e;
-            --bg-darker: #0f0f1a;
-            --text-light: #ffffff;
-            --text-dim: #aaaaaa;
-        }
-        
-        body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-        }
-        
-        /* Canvas container */
-        #game-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        #game-container canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-        
-        .loading-logo {
-            font-size: 4em;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px var(--primary-color);
-            animation: pulse 2s infinite;
-        }
-        
-        .loading-subtitle {
-            font-size: 1.5em;
-            color: var(--text-dim);
-            margin-bottom: 40px;
-        }
-        
-        .loading-bar-container {
-            width: 300px;
-            height: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        #loading-progress {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-        
-        #loading-text {
-            color: var(--text-dim);
-            font-size: 0.9em;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        /* Main Menu */
-        #main-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(26,26,46,0.95) 0%, rgba(15,15,26,0.95) 100%);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transition: opacity 0.3s ease;
-        }
-        
-        .menu-logo {
-            font-size: 5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-        }
-        
-        .menu-subtitle {
-            font-size: 1.5em;
-            color: var(--text-dim);
-            margin-bottom: 50px;
-        }
-        
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 300px;
-        }
-        
-        .menu-btn {
-            padding: 18px 40px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .menu-btn.primary {
-            background: linear-gradient(135deg, var(--primary-color), #c0392b);
-            color: white;
-        }
-        
-        .menu-btn.primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-        }
-        
-        .menu-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        
-        .menu-btn.secondary:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-        
-        .menu-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .menu-btn.disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .menu-version {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            color: var(--text-dim);
-            font-size: 0.8em;
-        }
-        
-        .menu-credits {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: var(--text-dim);
-            font-size: 0.8em;
-        }
-        
-        /* Error container */
-        .error-container {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .error-container h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-        
-        .error-container p {
-            color: var(--text-dim);
-            margin-bottom: 30px;
-        }
-        
-        .error-container button {
-            padding: 15px 30px;
-            font-size: 1.1em;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .loading-logo, .menu-logo {
-                font-size: 2.5em;
-            }
-            
-            .loading-subtitle, .menu-subtitle {
-                font-size: 1em;
-            }
-            
-            .menu-buttons {
-                width: 90%;
-                max-width: 300px;
-            }
-            
-            .menu-btn {
-                padding: 15px 30px;
-                font-size: 1em;
-            }
-        }
-        
-        /* Russian flag decoration */
-        .flag-decoration {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(to bottom, 
-                white 0%, white 33.33%, 
-                #0039a6 33.33%, #0039a6 66.66%, 
-                #d52b1e 66.66%, #d52b1e 100%);
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-darker);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #c0392b;
-        }
-    </style>
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <!-- Russian flag decoration -->
-    <div class="flag-decoration"></div>
-    
-    <!-- Game Canvas Container -->
-    <div id="game-container"></div>
-    
-    <!-- Loading Screen -->
+    <!-- ==================== LOADING SCREEN ==================== -->
     <div id="loading-screen">
-        <div class="loading-logo">🏗️ ГОЙДАБЛОКС</div>
-        <div class="loading-subtitle">Русский Роблокс</div>
-        <div class="loading-bar-container">
-            <div id="loading-progress"></div>
-        </div>
-        <div id="loading-text">Загрузка...</div>
-    </div>
-    
-    <!-- Main Menu -->
-    <div id="main-menu">
-        <div class="flag-decoration"></div>
-        <div class="menu-logo">ГОЙДАБЛОКС</div>
-        <div class="menu-subtitle">Построй свой путь в суровой российской действительности!</div>
-        
-        <div class="menu-buttons">
-            <button id="new-game-btn" class="menu-btn primary">
-                🎮 Новая игра
-            </button>
-            <button id="continue-btn" class="menu-btn secondary disabled" disabled>
-                ▶️ Продолжить
-            </button>
-            <button id="load-btn" class="menu-btn secondary">
-                📂 Загрузить
-            </button>
-            <button id="settings-btn" class="menu-btn secondary">
-                ⚙️ Настройки
-            </button>
-        </div>
-        
-        <div class="menu-credits">
-            Создано с ❤️ и Three.js
-        </div>
-        <div class="menu-version">
-            v1.0.0
+        <div class="loading-content">
+            <h1 class="loading-title">ГОЙДАБЛОКС</h1>
+            <p class="loading-subtitle">Симулятор жизни в России</p>
+            <div class="loading-bar">
+                <div id="loading-progress" class="loading-progress"></div>
+            </div>
+            <p id="loading-text" class="loading-text">Загрузка...</p>
         </div>
     </div>
     
-    <!-- Game scripts -->
-    <script type="module" src="./src/index.js"></script>
+    <!-- ==================== MAIN MENU ==================== -->
+    <div id="main-menu" class="hidden">
+        <div class="menu-content">
+            <h1 class="menu-title">ГОЙДАБЛОКС</h1>
+            <p class="menu-subtitle">Симулятор жизни в России 2024</p>
+            
+            <div class="menu-buttons">
+                <button id="btn-new-game" class="menu-btn primary">Новая игра</button>
+                <button id="btn-continue" class="menu-btn">Продолжить</button>
+                <button id="btn-settings" class="menu-btn">Настройки</button>
+            </div>
+            
+            <div class="menu-footer">
+                <p>Версия 2.0 | Made with ❤️</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ==================== GAME CANVAS ==================== -->
+    <canvas id="game-canvas"></canvas>
+    
+    <!-- ==================== CROSSHAIR ==================== -->
+    <div id="crosshair" class="hidden">
+        <div class="crosshair-dot"></div>
+    </div>
+    
+    <!-- ==================== GAME HUD ==================== -->
+    <div id="game-hud" class="hidden">
+        <!-- Stats Panel -->
+        <div id="player-stats">
+            <div class="stat-row">
+                <span class="stat-icon">❤️</span>
+                <div class="stat-bar-bg">
+                    <div id="health-bar" class="stat-bar-fill"></div>
+                </div>
+                <span class="stat-value">100</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-icon">🍔</span>
+                <div class="stat-bar-bg">
+                    <div id="hunger-bar" class="stat-bar-fill hunger"></div>
+                </div>
+                <span class="stat-value">100</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-icon">⚡</span>
+                <div class="stat-bar-bg">
+                    <div id="energy-bar" class="stat-bar-fill energy"></div>
+                </div>
+                <span class="stat-value">100</span>
+            </div>
+        </div>
+        
+        <!-- Money Display -->
+        <div id="money-display">
+            <span class="money-icon">💰</span>
+            <span id="money-value" class="money-value">10000</span>
+            <span class="money-currency">₽</span>
+        </div>
+        
+        <!-- Time Display -->
+        <div id="time-display">
+            <span id="weather-icon">☀️</span>
+            <span id="game-time">12:00</span>
+            <span class="time-separator">|</span>
+            <span id="game-date">1 Января</span>
+        </div>
+        
+        <!-- Minimap -->
+        <div id="minimap-container">
+            <canvas id="minimap-canvas" width="200" height="200"></canvas>
+            <div class="minimap-compass">N</div>
+        </div>
+        
+        <!-- Quest Tracker -->
+        <div id="quest-tracker">
+            <h3>📋 ЗАДАНИЕ</h3>
+            <div id="quest-title" class="quest-title">Нет активных заданий</div>
+            <div id="quest-objective" class="quest-objective">Исследуйте город</div>
+            <div class="quest-progress">
+                <div id="quest-progress" class="quest-progress-fill"></div>
+            </div>
+        </div>
+        
+        <!-- Vehicle HUD -->
+        <div id="vehicle-hud" class="hidden">
+            <div class="speedometer">
+                <div id="speed-value" class="speed-value">0</div>
+                <div class="speed-unit">км/ч</div>
+            </div>
+            <div class="fuel-gauge">
+                <span class="fuel-icon">⛽</span>
+                <div class="fuel-bar-bg">
+                    <div id="fuel-bar" class="fuel-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interaction Prompt -->
+        <div id="interaction-prompt" class="hidden">
+            <span class="prompt-key">E</span>
+            <span id="prompt-text" class="prompt-text">Взаимодействовать</span>
+        </div>
+        
+        <!-- FPS Counter -->
+        <div id="fps-counter">FPS: 60</div>
+        
+        <!-- Notifications -->
+        <div id="notifications-container"></div>
+    </div>
+    
+    <!-- ==================== PAUSE MENU ==================== -->
+    <div id="pause-menu" class="hidden">
+        <div class="pause-content">
+            <h2>ПАУЗА</h2>
+            <div class="pause-buttons">
+                <button id="btn-resume" class="menu-btn primary">Продолжить</button>
+                <button id="btn-save" class="menu-btn">Сохранить</button>
+                <button id="btn-pause-settings" class="menu-btn">Настройки</button>
+                <button id="btn-main-menu" class="menu-btn danger">В главное меню</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ==================== SETTINGS MENU ==================== -->
+    <div id="settings-menu" class="hidden">
+        <div class="settings-content">
+            <h2>Настройки</h2>
+            
+            <div class="settings-section">
+                <h3>Графика</h3>
+                <div class="setting-row">
+                    <label>Тени</label>
+                    <select id="setting-shadows">
+                        <option value="off">Выкл</option>
+                        <option value="low">Низкие</option>
+                        <option value="medium" selected>Средние</option>
+                        <option value="high">Высокие</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>Дальность прорисовки</label>
+                    <input type="range" id="setting-render-distance" min="100" max="500" value="300">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Управление</h3>
+                <div class="setting-row">
+                    <label>Чувствительность мыши</label>
+                    <input type="range" id="setting-sensitivity" min="1" max="100" value="50">
+                </div>
+                <div class="setting-row">
+                    <label>Инвертировать Y</label>
+                    <input type="checkbox" id="setting-invert-y">
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Звук</h3>
+                <div class="setting-row">
+                    <label>Общая громкость</label>
+                    <input type="range" id="setting-volume" min="0" max="100" value="80">
+                </div>
+                <div class="setting-row">
+                    <label>Музыка</label>
+                    <input type="range" id="setting-music" min="0" max="100" value="50">
+                </div>
+            </div>
+            
+            <div class="settings-buttons">
+                <button id="settings-apply" class="menu-btn primary">Применить</button>
+                <button id="settings-close" class="menu-btn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ==================== SHOP MENU ==================== -->
+    <div id="shop-menu" class="hidden">
+        <div class="shop-content">
+            <div class="shop-header">
+                <h2 id="shop-title">Магазин</h2>
+                <div class="shop-balance">
+                    <span>💰</span>
+                    <span id="shop-balance">0</span>
+                    <span>₽</span>
+                </div>
+                <button id="shop-close" class="close-btn">✕</button>
+            </div>
+            <div id="shop-items" class="shop-grid"></div>
+        </div>
+    </div>
+    
+    <!-- ==================== INVENTORY MENU ==================== -->
+    <div id="inventory-menu" class="hidden">
+        <div class="inventory-content">
+            <div class="inventory-header">
+                <h2>Инвентарь</h2>
+                <button id="inventory-close" class="close-btn">✕</button>
+            </div>
+            <div id="inventory-grid" class="inventory-grid"></div>
+        </div>
+    </div>
+    
+    <!-- ==================== DIALOG BOX ==================== -->
+    <div id="dialog-box" class="hidden">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <div id="dialog-portrait" class="dialog-portrait">👤</div>
+                <div id="dialog-speaker" class="dialog-speaker">Персонаж</div>
+            </div>
+            <div id="dialog-text" class="dialog-text">
+                Текст диалога...
+            </div>
+            <div id="dialog-options" class="dialog-options"></div>
+        </div>
+    </div>
+    
+    <!-- ==================== CONTROLS HINT ==================== -->
+    <div id="controls-hint" class="hidden">
+        <div class="controls-content">
+            <h3>Управление</h3>
+            <div class="control-row"><span>WASD</span><span>Движение</span></div>
+            <div class="control-row"><span>ПРОБЕЛ</span><span>Прыжок</span></div>
+            <div class="control-row"><span>SHIFT</span><span>Бег</span></div>
+            <div class="control-row"><span>E</span><span>Взаимодействие</span></div>
+            <div class="control-row"><span>I</span><span>Инвентарь</span></div>
+            <div class="control-row"><span>F</span><span>Выйти из машины</span></div>
+            <div class="control-row"><span>ESC</span><span>Пауза</span></div>
+        </div>
+    </div>
+    
+    <!-- ==================== GAME SCRIPT ==================== -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

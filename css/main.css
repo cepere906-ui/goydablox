@@ -1,0 +1,258 @@
+/* ==================== ОСНОВНЫЕ СТИЛИ ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #0a0a0f;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    color: #ffffff;
+    user-select: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==================== ЭКРАН ЗАГРУЗКИ ==================== */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a1a2a 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.game-title {
+    font-size: 5em;
+    font-weight: 900;
+    background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite, glow 2s ease-in-out infinite alternate;
+    text-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+    letter-spacing: 8px;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes glow {
+    from { filter: brightness(1) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)); }
+    to { filter: brightness(1.2) drop-shadow(0 0 40px rgba(255, 255, 255, 0.5)); }
+}
+
+.game-subtitle {
+    font-size: 1.5em;
+    color: #888;
+    margin-top: 10px;
+    letter-spacing: 4px;
+}
+
+.loading-bar {
+    width: 400px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin: 40px auto 20px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.loading-progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #00ff88, #00ffff, #00ff88);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease-out;
+    animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.loading-text {
+    color: #666;
+    font-size: 1.1em;
+}
+
+/* ==================== CANVAS ==================== */
+#game-canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* ==================== КНОПКИ ==================== */
+.menu-btn {
+    display: block;
+    width: 320px;
+    padding: 18px 30px;
+    margin: 12px auto;
+    font-size: 1.3em;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.menu-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.menu-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.menu-btn.danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.menu-btn.danger:hover {
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+.menu-btn.success {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+}
+
+.close-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(255, 100, 100, 0.3);
+    transform: rotate(90deg);
+}
+
+/* ==================== УВЕДОМЛЕНИЯ ==================== */
+#notifications-container {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    width: 320px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.notification {
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    animation: slideInRight 0.3s ease-out, fadeOut 0.5s ease-in 4.5s forwards;
+    border-left: 4px solid #00ff88;
+    backdrop-filter: blur(10px);
+}
+
+.notification.success { border-left-color: #00ff88; }
+.notification.warning { border-left-color: #feca57; }
+.notification.error { border-left-color: #ff6b6b; }
+.notification.info { border-left-color: #48dbfb; }
+
+.notification-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.notification-text {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* ==================== ПРИЦЕЛ ==================== */
+#crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 100;
+}
+
+.crosshair-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.crosshair-line.horizontal {
+    width: 20px;
+    height: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.crosshair-line.vertical {
+    width: 2px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ==================== СКРОЛЛБАР ==================== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
