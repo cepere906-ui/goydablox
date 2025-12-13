@@ -1,0 +1,583 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    overflow: hidden;
+    font-family: 'Arial Black', Arial, sans-serif;
+    background: #000;
+    user-select: none;
+}
+
+/* ===== LOADING SCREEN ===== */
+#loading-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 33%, #0039A6 33%, #0039A6 66%, #D52B1E 66%, #D52B1E 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 0.5s;
+}
+
+#loading-screen.hidden { opacity: 0; pointer-events: none; }
+
+.loading-title {
+    font-size: 4rem;
+    color: #000;
+    text-shadow: 3px 3px 0 #FFF, -2px -2px 0 #D52B1E;
+    margin-bottom: 10px;
+    animation: pulse 1.5s infinite;
+}
+
+.loading-subtitle {
+    font-size: 1.5rem;
+    color: #FFD700;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 30px;
+}
+
+.loading-bar-container {
+    width: 300px;
+    height: 30px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 3px solid #000;
+}
+
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #FFF, #0039A6, #D52B1E);
+    transition: width 0.3s;
+}
+
+.loading-text {
+    margin-top: 15px;
+    color: #FFF;
+    text-shadow: 1px 1px 2px #000;
+    font-size: 1.2rem;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+/* ===== MAIN MENU ===== */
+#main-menu {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 33%, #0039A6 33%, #0039A6 66%, #D52B1E 66%, #D52B1E 100%);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9000;
+}
+
+#main-menu h1 {
+    font-size: 5rem;
+    color: #000;
+    text-shadow: 4px 4px 0 #FFF, -3px -3px 0 #D52B1E, 8px 8px 15px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+    letter-spacing: 8px;
+    animation: pulse 2s infinite;
+}
+
+#main-menu .subtitle {
+    font-size: 1.5rem;
+    color: #FFF;
+    text-shadow: 2px 2px 4px #000;
+    margin-bottom: 50px;
+}
+
+.menu-btn {
+    padding: 20px 60px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: linear-gradient(180deg, #FFF 0%, #0039A6 50%, #D52B1E 100%);
+    border: 4px solid #000;
+    border-radius: 15px;
+    cursor: pointer;
+    color: #FFF;
+    text-shadow: 2px 2px 0 #000;
+    margin: 10px;
+    transition: all 0.2s;
+}
+
+.menu-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.menu-btn.secondary {
+    background: rgba(0,0,0,0.5);
+    font-size: 1.2rem;
+    padding: 15px 40px;
+}
+
+/* ===== GAME CONTAINER ===== */
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    display: none;
+}
+
+/* ===== HUD ===== */
+#hud {
+    position: fixed;
+    top: 10px; left: 10px;
+    color: #FFF;
+    font-size: 14px;
+    background: rgba(0,0,0,0.8);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #0039A6;
+    display: none;
+    z-index: 100;
+    min-width: 200px;
+}
+
+#hud .stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#hud .stat-label { color: #AAA; }
+#hud .stat-value { color: #FFF; font-weight: bold; }
+
+.health-bar, .stamina-bar, .fuel-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin-top: 3px;
+    overflow: hidden;
+}
+
+.health-bar .fill { background: #D52B1E; height: 100%; transition: width 0.3s; }
+.stamina-bar .fill { background: #FFD700; height: 100%; transition: width 0.3s; }
+.fuel-bar .fill { background: #00AA00; height: 100%; transition: width 0.3s; }
+
+/* ===== MINIMAP ===== */
+#minimap {
+    position: fixed;
+    top: 10px; right: 10px;
+    width: 200px; height: 200px;
+    background: rgba(0,0,0,0.8);
+    border: 3px solid #0039A6;
+    border-radius: 10px;
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+#minimap-canvas {
+    width: 100%; height: 100%;
+}
+
+#minimap-flag {
+    position: absolute;
+    bottom: 5px; right: 5px;
+    width: 40px; height: 27px;
+    background: linear-gradient(180deg, #FFF 0%, #FFF 33%, #0039A6 33%, #0039A6 66%, #D52B1E 66%, #D52B1E 100%);
+    border: 1px solid #000;
+    border-radius: 3px;
+}
+
+/* ===== CROSSHAIR ===== */
+#crosshair {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px; height: 24px;
+    display: none;
+    z-index: 100;
+    pointer-events: none;
+}
+
+#crosshair::before, #crosshair::after {
+    content: '';
+    position: absolute;
+    background: #FFF;
+    box-shadow: 0 0 3px #000;
+}
+
+#crosshair::before {
+    width: 2px; height: 24px;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+}
+
+#crosshair::after {
+    width: 24px; height: 2px;
+    top: 50%; left: 0;
+    transform: translateY(-50%);
+}
+
+/* ===== INTERACTION PROMPT ===== */
+#interaction-prompt {
+    position: fixed;
+    bottom: 150px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: #FFF;
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2px solid #FFD700;
+    font-size: 1.2rem;
+    display: none;
+    z-index: 100;
+    text-align: center;
+}
+
+#interaction-prompt .key {
+    display: inline-block;
+    background: #FFD700;
+    color: #000;
+    padding: 5px 15px;
+    border-radius: 5px;
+    margin: 0 5px;
+    font-weight: bold;
+}
+
+/* ===== VEHICLE HUD ===== */
+#vehicle-hud {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    padding: 20px 40px;
+    border-radius: 15px;
+    border: 3px solid #0039A6;
+    display: none;
+    z-index: 100;
+    text-align: center;
+}
+
+#speedometer {
+    font-size: 3rem;
+    color: #FFF;
+    font-family: 'Courier New', monospace;
+}
+
+#speedometer span { color: #D52B1E; }
+
+.vehicle-info {
+    color: #AAA;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.vehicle-info .key {
+    display: inline-block;
+    background: #FFD700;
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin: 0 3px;
+    font-weight: bold;
+}
+
+/* ===== INSTRUCTIONS ===== */
+#instructions {
+    position: fixed;
+    bottom: 10px; left: 50%;
+    transform: translateX(-50%);
+    color: #FFF;
+    font-size: 12px;
+    background: rgba(0,0,0,0.8);
+    padding: 10px 25px;
+    border-radius: 10px;
+    display: none;
+    z-index: 100;
+}
+
+/* ===== NOTIFICATIONS ===== */
+#notifications {
+    position: fixed;
+    top: 50%; right: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.notification {
+    background: rgba(0,0,0,0.9);
+    color: #FFF;
+    padding: 15px 25px;
+    border-radius: 10px;
+    border-left: 4px solid #FFD700;
+    animation: slideIn 0.3s, slideOut 0.3s 2.7s;
+    max-width: 300px;
+}
+
+.notification.success { border-left-color: #00AA00; }
+.notification.error { border-left-color: #D52B1E; }
+.notification.info { border-left-color: #0039A6; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ===== PAUSE MENU ===== */
+#pause-menu {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+
+#pause-menu h2 {
+    font-size: 3rem;
+    color: #FFF;
+    margin-bottom: 40px;
+}
+
+/* ===== DIALOG BOX ===== */
+#dialog-box {
+    position: fixed;
+    bottom: 100px; left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 800px;
+    background: rgba(0,0,0,0.95);
+    border: 3px solid #0039A6;
+    border-radius: 15px;
+    padding: 25px;
+    display: none;
+    z-index: 200;
+}
+
+#dialog-box .speaker {
+    color: #FFD700;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+#dialog-box .text {
+    color: #FFF;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+#dialog-box .options {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#dialog-box .option {
+    background: #0039A6;
+    color: #FFF;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#dialog-box .option:hover {
+    background: #D52B1E;
+    transform: scale(1.05);
+}
+
+/* ===== INVENTORY ===== */
+#inventory {
+    position: fixed;
+    bottom: 60px; left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    gap: 5px;
+    z-index: 100;
+}
+
+.inventory-slot {
+    width: 60px; height: 60px;
+    background: rgba(0,0,0,0.8);
+    border: 2px solid #555;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    position: relative;
+}
+
+.inventory-slot.active { border-color: #FFD700; }
+
+.inventory-slot .count {
+    position: absolute;
+    bottom: 2px; right: 5px;
+    font-size: 0.8rem;
+    color: #FFF;
+}
+
+.inventory-slot .key-hint {
+    position: absolute;
+    top: 2px; left: 5px;
+    font-size: 0.7rem;
+    color: #AAA;
+}
+
+/* ===== MONEY DISPLAY ===== */
+#money-display {
+    position: fixed;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    padding: 10px 30px;
+    border-radius: 10px;
+    border: 2px solid #FFD700;
+    display: none;
+    z-index: 100;
+}
+
+#money-display .amount {
+    font-size: 1.5rem;
+    color: #FFD700;
+}
+
+/* ===== QUEST TRACKER ===== */
+#quest-tracker {
+    position: fixed;
+    top: 220px; left: 10px;
+    background: rgba(0,0,0,0.8);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #D52B1E;
+    display: none;
+    z-index: 100;
+    max-width: 250px;
+}
+
+#quest-tracker h3 {
+    color: #FFD700;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+#quest-tracker .quest {
+    color: #FFF;
+    font-size: 0.9rem;
+    margin: 5px 0;
+    padding-left: 15px;
+    position: relative;
+}
+
+#quest-tracker .quest::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #D52B1E;
+}
+
+#quest-tracker .quest.completed { color: #00AA00; text-decoration: line-through; }
+
+/* ===== SETTINGS MODAL ===== */
+#settings-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    border: 3px solid #0039A6;
+    display: none;
+    z-index: 9500;
+    min-width: 400px;
+}
+
+#settings-modal h2 {
+    color: #FFF;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.settings-group {
+    margin: 20px 0;
+    color: #FFF;
+}
+
+.settings-group label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.settings-group input[type="range"] {
+    width: 100%;
+}
+
+.settings-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+/* ===== COMPASS ===== */
+#compass {
+    position: fixed;
+    top: 60px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    padding: 5px 20px;
+    border-radius: 5px;
+    color: #FFF;
+    font-size: 0.9rem;
+    display: none;
+    z-index: 100;
+}
+
+/* ===== FPS COUNTER ===== */
+#fps-counter {
+    position: fixed;
+    top: 10px; left: 220px;
+    background: rgba(0,0,0,0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #0F0;
+    font-size: 0.8rem;
+    display: none;
+    z-index: 100;
+    font-family: monospace;
+}
+
+/* ===== WEATHER OVERLAY ===== */
+#weather-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+}
+
+#weather-overlay.rain {
+    background: linear-gradient(transparent, rgba(100,100,150,0.3));
+}
+
+#weather-overlay.snow {
+    background: linear-gradient(transparent, rgba(255,255,255,0.2));
+}

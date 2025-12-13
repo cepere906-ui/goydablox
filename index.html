@@ -3,263 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ГОЙДАБЛОКС - Симулятор жизни в России</title>
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/hud.css">
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/dialogs.css">
-    
-    <!-- Three.js from CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>ГОЙДАБЛОКС - Симулятор России ULTIMATE</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- ==================== LOADING SCREEN ==================== -->
+    <!-- Loading Screen -->
     <div id="loading-screen">
-        <div class="loading-content">
-            <h1 class="loading-title">ГОЙДАБЛОКС</h1>
-            <p class="loading-subtitle">Симулятор жизни в России</p>
-            <div class="loading-bar">
-                <div id="loading-progress" class="loading-progress"></div>
-            </div>
-            <p id="loading-text" class="loading-text">Загрузка...</p>
+        <div class="loading-title">🇷🇺 ГОЙДАБЛОКС 🇷🇺</div>
+        <div class="loading-subtitle">ULTIMATE EDITION</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loading-bar"></div>
         </div>
+        <div class="loading-text" id="loading-text">Загрузка матушки России...</div>
     </div>
     
-    <!-- ==================== MAIN MENU ==================== -->
-    <div id="main-menu" class="hidden">
-        <div class="menu-content">
-            <h1 class="menu-title">ГОЙДАБЛОКС</h1>
-            <p class="menu-subtitle">Симулятор жизни в России 2024</p>
-            
-            <div class="menu-buttons">
-                <button id="btn-new-game" class="menu-btn primary">Новая игра</button>
-                <button id="btn-continue" class="menu-btn">Продолжить</button>
-                <button id="btn-settings" class="menu-btn">Настройки</button>
-            </div>
-            
-            <div class="menu-footer">
-                <p>Версия 2.0 | Made with ❤️</p>
-            </div>
+    <!-- Main Menu -->
+    <div id="main-menu">
+        <h1>🇷🇺 ГОЙДАБЛОКС 🇷🇺</h1>
+        <div class="subtitle">ULTIMATE EDITION - Бесконечная Россия</div>
+        <button class="menu-btn" id="start-btn">▶ НАЧАТЬ ИГРУ</button>
+        <button class="menu-btn secondary" id="settings-btn">⚙ НАСТРОЙКИ</button>
+        <button class="menu-btn secondary" id="credits-btn">ℹ ОБ ИГРЕ</button>
+    </div>
+    
+    <!-- Game Container -->
+    <div id="game-container"></div>
+    
+    <!-- HUD Elements -->
+    <div id="hud">
+        <div class="stat-row">
+            <span class="stat-label">❤️ Здоровье</span>
         </div>
-    </div>
-    
-    <!-- ==================== GAME CANVAS ==================== -->
-    <canvas id="game-canvas"></canvas>
-    
-    <!-- ==================== CROSSHAIR ==================== -->
-    <div id="crosshair" class="hidden">
-        <div class="crosshair-dot"></div>
-    </div>
-    
-    <!-- ==================== GAME HUD ==================== -->
-    <div id="game-hud" class="hidden">
-        <!-- Stats Panel -->
-        <div id="player-stats">
-            <div class="stat-row">
-                <span class="stat-icon">❤️</span>
-                <div class="stat-bar-bg">
-                    <div id="health-bar" class="stat-bar-fill"></div>
-                </div>
-                <span class="stat-value">100</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-icon">🍔</span>
-                <div class="stat-bar-bg">
-                    <div id="hunger-bar" class="stat-bar-fill hunger"></div>
-                </div>
-                <span class="stat-value">100</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-icon">⚡</span>
-                <div class="stat-bar-bg">
-                    <div id="energy-bar" class="stat-bar-fill energy"></div>
-                </div>
-                <span class="stat-value">100</span>
-            </div>
+        <div class="health-bar"><div class="fill" id="health-fill" style="width: 100%"></div></div>
+        
+        <div class="stat-row">
+            <span class="stat-label">⚡ Выносливость</span>
+        </div>
+        <div class="stamina-bar"><div class="fill" id="stamina-fill" style="width: 100%"></div></div>
+        
+        <div class="stat-row">
+            <span class="stat-label">📍 Позиция</span>
+            <span class="stat-value"><span id="pos-x">0</span>, <span id="pos-z">0</span></span>
         </div>
         
-        <!-- Money Display -->
-        <div id="money-display">
-            <span class="money-icon">💰</span>
-            <span id="money-value" class="money-value">10000</span>
-            <span class="money-currency">₽</span>
+        <div class="stat-row">
+            <span class="stat-label">🗺️ Чанк</span>
+            <span class="stat-value" id="chunk-pos">0, 0</span>
         </div>
         
-        <!-- Time Display -->
-        <div id="time-display">
-            <span id="weather-icon">☀️</span>
-            <span id="game-time">12:00</span>
-            <span class="time-separator">|</span>
-            <span id="game-date">1 Января</span>
+        <div class="stat-row">
+            <span class="stat-label">🕐 Время</span>
+            <span class="stat-value" id="game-time">12:00</span>
         </div>
         
-        <!-- Minimap -->
-        <div id="minimap-container">
-            <canvas id="minimap-canvas" width="200" height="200"></canvas>
-            <div class="minimap-compass">N</div>
+        <div class="stat-row">
+            <span class="stat-label">🌡️ Погода</span>
+            <span class="stat-value" id="weather">Ясно</span>
         </div>
         
-        <!-- Quest Tracker -->
-        <div id="quest-tracker">
-            <h3>📋 ЗАДАНИЕ</h3>
-            <div id="quest-title" class="quest-title">Нет активных заданий</div>
-            <div id="quest-objective" class="quest-objective">Исследуйте город</div>
-            <div class="quest-progress">
-                <div id="quest-progress" class="quest-progress-fill"></div>
-            </div>
-        </div>
-        
-        <!-- Vehicle HUD -->
-        <div id="vehicle-hud" class="hidden">
-            <div class="speedometer">
-                <div id="speed-value" class="speed-value">0</div>
-                <div class="speed-unit">км/ч</div>
-            </div>
-            <div class="fuel-gauge">
-                <span class="fuel-icon">⛽</span>
-                <div class="fuel-bar-bg">
-                    <div id="fuel-bar" class="fuel-bar-fill"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Interaction Prompt -->
-        <div id="interaction-prompt" class="hidden">
-            <span class="prompt-key">E</span>
-            <span id="prompt-text" class="prompt-text">Взаимодействовать</span>
-        </div>
-        
-        <!-- FPS Counter -->
-        <div id="fps-counter">FPS: 60</div>
-        
-        <!-- Notifications -->
-        <div id="notifications-container"></div>
-    </div>
-    
-    <!-- ==================== PAUSE MENU ==================== -->
-    <div id="pause-menu" class="hidden">
-        <div class="pause-content">
-            <h2>ПАУЗА</h2>
-            <div class="pause-buttons">
-                <button id="btn-resume" class="menu-btn primary">Продолжить</button>
-                <button id="btn-save" class="menu-btn">Сохранить</button>
-                <button id="btn-pause-settings" class="menu-btn">Настройки</button>
-                <button id="btn-main-menu" class="menu-btn danger">В главное меню</button>
-            </div>
+        <div class="stat-row">
+            <span class="stat-label">🏠 Зданий</span>
+            <span class="stat-value" id="building-count">0</span>
         </div>
     </div>
     
-    <!-- ==================== SETTINGS MENU ==================== -->
-    <div id="settings-menu" class="hidden">
-        <div class="settings-content">
-            <h2>Настройки</h2>
-            
-            <div class="settings-section">
-                <h3>Графика</h3>
-                <div class="setting-row">
-                    <label>Тени</label>
-                    <select id="setting-shadows">
-                        <option value="off">Выкл</option>
-                        <option value="low">Низкие</option>
-                        <option value="medium" selected>Средние</option>
-                        <option value="high">Высокие</option>
-                    </select>
-                </div>
-                <div class="setting-row">
-                    <label>Дальность прорисовки</label>
-                    <input type="range" id="setting-render-distance" min="100" max="500" value="300">
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h3>Управление</h3>
-                <div class="setting-row">
-                    <label>Чувствительность мыши</label>
-                    <input type="range" id="setting-sensitivity" min="1" max="100" value="50">
-                </div>
-                <div class="setting-row">
-                    <label>Инвертировать Y</label>
-                    <input type="checkbox" id="setting-invert-y">
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h3>Звук</h3>
-                <div class="setting-row">
-                    <label>Общая громкость</label>
-                    <input type="range" id="setting-volume" min="0" max="100" value="80">
-                </div>
-                <div class="setting-row">
-                    <label>Музыка</label>
-                    <input type="range" id="setting-music" min="0" max="100" value="50">
-                </div>
-            </div>
-            
-            <div class="settings-buttons">
-                <button id="settings-apply" class="menu-btn primary">Применить</button>
-                <button id="settings-close" class="menu-btn">Закрыть</button>
-            </div>
-        </div>
+    <!-- Minimap -->
+    <div id="minimap">
+        <canvas id="minimap-canvas" width="200" height="200"></canvas>
+        <div id="minimap-flag"></div>
     </div>
     
-    <!-- ==================== SHOP MENU ==================== -->
-    <div id="shop-menu" class="hidden">
-        <div class="shop-content">
-            <div class="shop-header">
-                <h2 id="shop-title">Магазин</h2>
-                <div class="shop-balance">
-                    <span>💰</span>
-                    <span id="shop-balance">0</span>
-                    <span>₽</span>
-                </div>
-                <button id="shop-close" class="close-btn">✕</button>
-            </div>
-            <div id="shop-items" class="shop-grid"></div>
-        </div>
+    <!-- Money Display -->
+    <div id="money-display">
+        <span class="amount">💰 <span id="money-amount">10000</span> ₽</span>
     </div>
     
-    <!-- ==================== INVENTORY MENU ==================== -->
-    <div id="inventory-menu" class="hidden">
-        <div class="inventory-content">
-            <div class="inventory-header">
-                <h2>Инвентарь</h2>
-                <button id="inventory-close" class="close-btn">✕</button>
-            </div>
-            <div id="inventory-grid" class="inventory-grid"></div>
-        </div>
+    <!-- Quest Tracker -->
+    <div id="quest-tracker">
+        <h3>📋 ЗАДАНИЯ</h3>
+        <div id="quest-list"></div>
     </div>
     
-    <!-- ==================== DIALOG BOX ==================== -->
-    <div id="dialog-box" class="hidden">
-        <div class="dialog-content">
-            <div class="dialog-header">
-                <div id="dialog-portrait" class="dialog-portrait">👤</div>
-                <div id="dialog-speaker" class="dialog-speaker">Персонаж</div>
-            </div>
-            <div id="dialog-text" class="dialog-text">
-                Текст диалога...
-            </div>
-            <div id="dialog-options" class="dialog-options"></div>
-        </div>
+    <!-- Inventory -->
+    <div id="inventory"></div>
+    
+    <!-- Crosshair -->
+    <div id="crosshair"></div>
+    
+    <!-- Interaction Prompt -->
+    <div id="interaction-prompt"></div>
+    
+    <!-- Vehicle HUD -->
+    <div id="vehicle-hud">
+        <div id="speedometer">0 <span>км/ч</span></div>
+        <div class="fuel-bar"><div class="fill" id="fuel-fill" style="width: 100%"></div></div>
+        <div class="vehicle-info">ЛАДА ГРАНТА | <span class="key">F</span> - Выйти | <span class="key">R</span> - Радио</div>
     </div>
     
-    <!-- ==================== CONTROLS HINT ==================== -->
-    <div id="controls-hint" class="hidden">
-        <div class="controls-content">
-            <h3>Управление</h3>
-            <div class="control-row"><span>WASD</span><span>Движение</span></div>
-            <div class="control-row"><span>ПРОБЕЛ</span><span>Прыжок</span></div>
-            <div class="control-row"><span>SHIFT</span><span>Бег</span></div>
-            <div class="control-row"><span>E</span><span>Взаимодействие</span></div>
-            <div class="control-row"><span>I</span><span>Инвентарь</span></div>
-            <div class="control-row"><span>F</span><span>Выйти из машины</span></div>
-            <div class="control-row"><span>ESC</span><span>Пауза</span></div>
-        </div>
+    <!-- Instructions -->
+    <div id="instructions">
+        WASD - движение | ПРОБЕЛ - прыжок | SHIFT - бег | E - взаимодействие | F - войти/выйти | ESC - пауза
     </div>
     
-    <!-- ==================== GAME SCRIPT ==================== -->
-    <script type="module" src="js/main.js"></script>
+    <!-- Notifications -->
+    <div id="notifications"></div>
+    
+    <!-- Pause Menu -->
+    <div id="pause-menu">
+        <h2>⏸️ ПАУЗА</h2>
+        <button class="menu-btn" id="resume-btn">▶ ПРОДОЛЖИТЬ</button>
+        <button class="menu-btn secondary" id="menu-btn">🏠 В МЕНЮ</button>
+    </div>
+    
+    <!-- Dialog Box -->
+    <div id="dialog-box">
+        <div class="speaker" id="dialog-speaker">NPC</div>
+        <div class="text" id="dialog-text">Текст диалога...</div>
+        <div class="options" id="dialog-options"></div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal">
+        <h2>⚙ НАСТРОЙКИ</h2>
+        <div class="settings-group">
+            <label>Дальность прорисовки: <span id="render-dist-val">3</span></label>
+            <input type="range" id="render-distance" min="2" max="6" value="3">
+        </div>
+        <div class="settings-group">
+            <label>Чувствительность мыши: <span id="mouse-sens-val">1.0</span></label>
+            <input type="range" id="mouse-sensitivity" min="0.5" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="settings-group">
+            <label>Качество теней:</label>
+            <select id="shadow-quality">
+                <option value="low">Низкое</option>
+                <option value="medium" selected>Среднее</option>
+                <option value="high">Высокое</option>
+            </select>
+        </div>
+        <button class="menu-btn" id="close-settings">Закрыть</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/textures.js"></script>
+    <script src="js/buildings.js"></script>
+    <script src="js/vehicles.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/physics.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
