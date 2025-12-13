@@ -5,8 +5,8 @@
 const CONFIG = {
     // Мир и чанки
     chunkSize: 100,           // Размер одного чанка в метрах
-    renderDistance: 3,        // Количество чанков в каждом направлении
-    unloadDistance: 5,        // Расстояние для выгрузки чанков
+    renderDistance: 2,        // Количество чанков в каждом направлении (уменьшено для производительности)
+    unloadDistance: 3,        // Расстояние для выгрузки чанков
     
     // Физика
     gravity: -25,
@@ -38,9 +38,9 @@ const CONFIG = {
     playerHeight: 2,
     
     // Графика
-    shadowMapSize: 2048,
-    fogNear: 150,
-    fogFar: 400,
+    shadowMapSize: 1024,      // Уменьшено для производительности
+    fogNear: 100,
+    fogFar: 250,              // Уменьшено для производительности
     
     // Время
     dayLength: 600, // секунд на полный день
@@ -50,9 +50,11 @@ const CONFIG = {
     sidewalkWidth: 3,
     buildingMinHeight: 8,
     buildingMaxHeight: 45,
-    treeChance: 0.15,
-    npcPerChunk: 2,
+    treeChance: 0.08,         // Уменьшено для производительности
+    npcPerChunk: 1,           // Уменьшено для производительности
     vehiclePerChunk: 1,
+    maxBuildingsPerChunk: 4,  // Ограничение зданий
+    maxDecorationsPerChunk: 10, // Ограничение декораций
     
     // Специальные здания
     kremlinChunk: { x: 0, z: 0 }, // Кремль в центре

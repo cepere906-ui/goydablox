@@ -1,6 +1,19 @@
 // ============================================================
-// ГОЙДАБЛОКС - ИГРОК И NPC
+// ГОЙДАБЛОКС - ИГРОК И NPC (ОПТИМИЗИРОВАННАЯ ВЕРСИЯ)
 // ============================================================
+
+// Кэш материалов для переиспользования
+const SharedMaterials = {
+    cache: new Map(),
+    
+    get(color) {
+        const key = color.toString(16);
+        if (!this.cache.has(key)) {
+            this.cache.set(key, new THREE.MeshLambertMaterial({ color }));
+        }
+        return this.cache.get(key);
+    }
+};
 
 const PlayerFactory = {
     materials: {},
@@ -499,6 +512,48 @@ const NPCFactory = {
                 child.rotation.x = Math.sin(time * data.walkSpeed * 5 + (i === 4 ? 0 : Math.PI)) * 0.3;
             }
         });
+    },
+    
+    // Упрощённый NPC для оптимизации
+    createSimpleNPC() {
+        const npc = new THREE.Group();
+        npc.name = 'npc';
+        
+        // Тело - один блок
+        const bodyGeom = new THREE.BoxGeometry(0.6, 1.6, 0.4);
+        const bodyMat = SharedMaterials.get(0x444444);
+        const body = new THREE.Mesh(bodyGeom, bodyMat);
+        body.position.y = 0.8;
+        body.castShadow = true;
+        npc.add(body);
+        
+        // Голова - один блок
+        const headGeom = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+        const headMat = SharedMaterials.get(0xFFDBB4);
+        const head = new THREE.Mesh(headGeom, headMat);
+        head.position.y = 1.8;
+        npc.add(head);
+        
+        // Настройки NPC
+        npc.userData = {
+            type: 'npc',
+            npcType: 'civilian',
+            walkTarget: null,
+            walkSpeed: 1.5 + Math.random() * 1.5,
+            idleTime: 0,
+            dialogues: ['Привет!', 'Как дела?'],
+            interactable: {
+                prompt: 'Нажмите E чтобы поговорить',
+                action: () => {
+                    DialogSystem.show('Гражданин', 'Привет! Хорошая погода сегодня!', [
+                        { text: 'Да, отличная!' },
+                        { text: 'До свидания' }
+                    ]);
+                }
+            }
+        };
+        
+        return npc;
     }
 };
 
@@ -819,5 +874,41 @@ const DecorationFactory = {
         stop.add(sign);
         
         return stop;
+    },
+    
+    // Упрощённое дерево для оптимизации (меньше полигонов)
+    createSimpleTree() {
+        const tree = new THREE.Group();
+        
+        // Ствол - простой цилиндр
+        const trunkGeom = new THREE.CylinderGeometry(0.2, 0.3, 4, 6);
+        const trunkMat = SharedMaterials.get(0x8B4513);
+        const trunk = new THREE.Mesh(trunkGeom, trunkMat);
+        trunk.position.y = 2;
+        trunk.castShadow = true;
+        tree.add(trunk);
+        
+        // Крона - один конус (ёлка) или сфера (лиственное)
+        const isConifer = Math.random() > 0.5;
+        
+        if (isConifer) {
+            // Ёлка - один конус
+            const coneGeom = new THREE.ConeGeometry(2, 5, 6);
+            const coneMat = SharedMaterials.get(0x228B22);
+            const cone = new THREE.Mesh(coneGeom, coneMat);
+            cone.position.y = 5.5;
+            cone.castShadow = true;
+            tree.add(cone);
+        } else {
+            // Лиственное - одна сфера
+            const leavesGeom = new THREE.SphereGeometry(2.5, 6, 6);
+            const leavesMat = SharedMaterials.get(0x2E8B2E);
+            const leaves = new THREE.Mesh(leavesGeom, leavesMat);
+            leaves.position.y = 5;
+            leaves.castShadow = true;
+            tree.add(leaves);
+        }
+        
+        return tree;
     }
 };

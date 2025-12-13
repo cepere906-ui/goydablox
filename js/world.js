@@ -1,5 +1,5 @@
 // ============================================================
-// ГОЙДАБЛОКС - ГЕНЕРАЦИЯ МИРА
+// ГОЙДАБЛОКС - ГЕНЕРАЦИЯ МИРА (ОПТИМИЗИРОВАННАЯ ВЕРСИЯ)
 // ============================================================
 
 const WorldGenerator = {
@@ -10,6 +10,10 @@ const WorldGenerator = {
     // Основные дороги (глобальные координаты)
     mainRoads: [],
     
+    // Общие материалы (переиспользуем)
+    sharedMaterials: {},
+    sharedGeometries: {},
+    
     // Инициализация
     init() {
         // Определяем главные дороги (проходят через центр)
@@ -17,6 +21,24 @@ const WorldGenerator = {
             { axis: 'x', offset: 0 },  // Главная дорога по X через центр
             { axis: 'z', offset: 0 },  // Главная дорога по Z через центр
         ];
+        
+        // Создаём общие материалы
+        this.initSharedResources();
+    },
+    
+    // Инициализация общих ресурсов
+    initSharedResources() {
+        this.sharedMaterials = {
+            road: new THREE.MeshLambertMaterial({ color: COLORS.road }),
+            roadMarking: new THREE.MeshBasicMaterial({ color: COLORS.roadMarking }),
+            sidewalk: new THREE.MeshLambertMaterial({ color: COLORS.sidewalk }),
+            grass: new THREE.MeshLambertMaterial({ color: COLORS.grass }),
+        };
+        
+        this.sharedGeometries = {
+            roadMarkingH: new THREE.PlaneGeometry(3, 0.3),
+            roadMarkingV: new THREE.PlaneGeometry(0.3, 3),
+        };
     },
     
     // Получить или создать чанк
@@ -78,86 +100,59 @@ const WorldGenerator = {
         return chunk;
     },
     
-    // Генерация земли
+    // Генерация земли (оптимизированная)
     generateGround(chunk, worldX, worldZ, size) {
-        const groundTexture = TextureGenerator.grass();
-        groundTexture.wrapS = THREE.RepeatWrapping;
-        groundTexture.wrapT = THREE.RepeatWrapping;
-        groundTexture.repeat.set(size / 10, size / 10);
-        
+        // Используем простой цвет вместо текстуры для экономии памяти
         const groundGeom = new THREE.PlaneGeometry(size, size);
-        const groundMat = new THREE.MeshLambertMaterial({ map: groundTexture });
-        const ground = new THREE.Mesh(groundGeom, groundMat);
+        const ground = new THREE.Mesh(groundGeom, this.sharedMaterials.grass);
         ground.rotation.x = -Math.PI / 2;
         ground.position.set(worldX + size / 2, 0, worldZ + size / 2);
         ground.receiveShadow = true;
         chunk.add(ground);
     },
     
-    // Генерация дорог
+    // Генерация дорог (оптимизированная - меньше разметки)
     generateRoads(chunk, cx, cz, worldX, worldZ, size, seed) {
         const roadWidth = CONFIG.roadWidth;
-        const roadMat = new THREE.MeshLambertMaterial({ color: COLORS.road });
-        const markingMat = new THREE.MeshBasicMaterial({ color: COLORS.roadMarking });
-        const sidewalkMat = new THREE.MeshLambertMaterial({ color: COLORS.sidewalk });
         
-        // Главные дороги проходят через каждый чанк
         // Дорога по X (горизонтальная)
-        if (true) { // Всегда генерируем дорогу через центр чанка по X
-            const roadGeom = new THREE.PlaneGeometry(size, roadWidth);
-            const road = new THREE.Mesh(roadGeom, roadMat);
-            road.rotation.x = -Math.PI / 2;
-            road.position.set(worldX + size / 2, 0.01, worldZ + size / 2);
-            road.receiveShadow = true;
-            chunk.add(road);
-            
-            // Разметка
-            const numMarkings = Math.floor(size / 6);
-            for (let i = 0; i < numMarkings; i++) {
-                const markGeom = new THREE.PlaneGeometry(3, 0.3);
-                const mark = new THREE.Mesh(markGeom, markingMat);
-                mark.rotation.x = -Math.PI / 2;
-                mark.position.set(worldX + 3 + i * 6, 0.02, worldZ + size / 2);
-                chunk.add(mark);
-            }
-            
-            // Тротуары
-            [-roadWidth / 2 - 1.5, roadWidth / 2 + 1.5].forEach(offset => {
-                const sidewalkGeom = new THREE.BoxGeometry(size, 0.15, 3);
-                const sidewalk = new THREE.Mesh(sidewalkGeom, sidewalkMat);
-                sidewalk.position.set(worldX + size / 2, 0.075, worldZ + size / 2 + offset);
-                sidewalk.receiveShadow = true;
-                chunk.add(sidewalk);
-            });
+        const roadGeomH = new THREE.PlaneGeometry(size, roadWidth);
+        const roadH = new THREE.Mesh(roadGeomH, this.sharedMaterials.road);
+        roadH.rotation.x = -Math.PI / 2;
+        roadH.position.set(worldX + size / 2, 0.01, worldZ + size / 2);
+        chunk.add(roadH);
+        
+        // Упрощённая разметка (меньше объектов)
+        const numMarkings = Math.floor(size / 15); // Реже
+        for (let i = 0; i < numMarkings; i++) {
+            const mark = new THREE.Mesh(this.sharedGeometries.roadMarkingH, this.sharedMaterials.roadMarking);
+            mark.rotation.x = -Math.PI / 2;
+            mark.position.set(worldX + 7 + i * 15, 0.02, worldZ + size / 2);
+            chunk.add(mark);
         }
         
-        // Дорога по Z (вертикальная) - только каждые 2 чанка
-        if (cx % 2 === 0) {
-            const roadGeom = new THREE.PlaneGeometry(roadWidth, size);
-            const road = new THREE.Mesh(roadGeom, roadMat);
-            road.rotation.x = -Math.PI / 2;
-            road.position.set(worldX + size / 2, 0.02, worldZ + size / 2);
-            road.receiveShadow = true;
-            chunk.add(road);
+        // Тротуары (упрощённые)
+        const sidewalkGeomH = new THREE.BoxGeometry(size, 0.1, 2);
+        [-roadWidth / 2 - 1, roadWidth / 2 + 1].forEach(offset => {
+            const sidewalk = new THREE.Mesh(sidewalkGeomH, this.sharedMaterials.sidewalk);
+            sidewalk.position.set(worldX + size / 2, 0.05, worldZ + size / 2 + offset);
+            chunk.add(sidewalk);
+        });
+        
+        // Дорога по Z (вертикальная) - только каждые 3 чанка (реже)
+        if (cx % 3 === 0) {
+            const roadGeomV = new THREE.PlaneGeometry(roadWidth, size);
+            const roadV = new THREE.Mesh(roadGeomV, this.sharedMaterials.road);
+            roadV.rotation.x = -Math.PI / 2;
+            roadV.position.set(worldX + size / 2, 0.02, worldZ + size / 2);
+            chunk.add(roadV);
             
-            // Разметка
-            const numMarkings = Math.floor(size / 6);
             for (let i = 0; i < numMarkings; i++) {
-                const markGeom = new THREE.PlaneGeometry(0.3, 3);
-                const mark = new THREE.Mesh(markGeom, markingMat);
+                const mark = new THREE.Mesh(this.sharedGeometries.roadMarkingV, this.sharedMaterials.roadMarking);
                 mark.rotation.x = -Math.PI / 2;
-                mark.position.set(worldX + size / 2, 0.03, worldZ + 3 + i * 6);
+                mark.position.set(worldX + size / 2, 0.03, worldZ + 7 + i * 15);
                 chunk.add(mark);
             }
-            
-            // Тротуары
-            [-roadWidth / 2 - 1.5, roadWidth / 2 + 1.5].forEach(offset => {
-                const sidewalkGeom = new THREE.BoxGeometry(3, 0.15, size);
-                const sidewalk = new THREE.Mesh(sidewalkGeom, sidewalkMat);
-                sidewalk.position.set(worldX + size / 2 + offset, 0.075, worldZ + size / 2);
-                sidewalk.receiveShadow = true;
-                chunk.add(sidewalk);
-            });
         }
     },
     
@@ -409,57 +404,53 @@ const WorldGenerator = {
         return mausoleum;
     },
     
-    // Генерация зданий
+    // Генерация зданий (оптимизированная)
     generateBuildings(chunk, cx, cz, worldX, worldZ, size, seed) {
         const rng = (offset) => Utils.seededRandom(seed + offset);
         
-        // Количество зданий зависит от удалённости от центра
-        const distFromCenter = Math.sqrt(cx * cx + cz * cz);
-        const buildingDensity = Math.max(1, 6 - distFromCenter * 0.5);
-        const numBuildings = Math.floor(buildingDensity + rng(0) * 3);
+        // Ограниченное количество зданий
+        const numBuildings = Math.min(CONFIG.maxBuildingsPerChunk, 2 + Math.floor(rng(0) * 3));
         
         // Зоны для размещения (избегаем дорог)
         const zones = [
-            { x: worldX + 15, z: worldZ + 15, w: 30, d: 30 },
-            { x: worldX + 55, z: worldZ + 15, w: 30, d: 30 },
-            { x: worldX + 15, z: worldZ + 55, w: 30, d: 30 },
-            { x: worldX + 55, z: worldZ + 55, w: 30, d: 30 }
+            { x: worldX + 20, z: worldZ + 20 },
+            { x: worldX + 60, z: worldZ + 20 },
+            { x: worldX + 20, z: worldZ + 60 },
+            { x: worldX + 60, z: worldZ + 60 }
         ];
         
-        // Специальные здания в некоторых чанках
-        if ((cx + cz) % 5 === 0 && rng(100) > 0.5) {
+        // Специальные здания в некоторых чанках (реже)
+        if ((cx + cz) % 7 === 0 && rng(100) > 0.6) {
             this.generateSpecialBuilding(chunk, cx, cz, worldX, worldZ, seed);
+            return; // Только спец здание в этом чанке
         }
         
         // Обычные здания
-        for (let i = 0; i < numBuildings; i++) {
-            const zone = zones[Math.floor(rng(i * 10) * zones.length)];
-            const x = zone.x + rng(i * 20) * zone.w;
-            const z = zone.z + rng(i * 30) * zone.d;
+        for (let i = 0; i < numBuildings && i < zones.length; i++) {
+            const zone = zones[i];
+            const x = zone.x + (rng(i * 20) - 0.5) * 15;
+            const z = zone.z + (rng(i * 30) - 0.5) * 15;
             
             let building;
             const buildingType = rng(i * 40);
             
-            if (buildingType < 0.4) {
-                // Панелька
-                const floors = 5 + Math.floor(rng(i * 50) * 10);
+            if (buildingType < 0.5) {
+                // Панелька (упрощённая)
+                const floors = 5 + Math.floor(rng(i * 50) * 5);
                 building = BuildingFactory.createPanelka(floors);
-            } else if (buildingType < 0.6) {
+            } else if (buildingType < 0.7) {
                 // Хрущёвка
                 building = BuildingFactory.createKhrushchevka();
-            } else if (buildingType < 0.75) {
-                // Сталинка
-                building = BuildingFactory.createStalinka();
             } else if (buildingType < 0.85) {
                 // Магазин
-                const shopTypes = ['pyaterochka', 'magnit', 'shawarma'];
+                const shopTypes = ['pyaterochka', 'shawarma'];
                 building = BuildingFactory.createShop(shopTypes[Math.floor(rng(i * 60) * shopTypes.length)]);
                 if (building.userData.interactable) {
                     GameState.interactables.push(building);
                 }
             } else {
-                // Церковь
-                building = BuildingFactory.createChurch();
+                // Простое здание
+                building = BuildingFactory.createKhrushchevka();
             }
             
             if (building) {
@@ -512,134 +503,57 @@ const WorldGenerator = {
         }
     },
     
-    // Генерация декораций
+    // Генерация декораций (сильно оптимизированная)
     generateDecorations(chunk, cx, cz, worldX, worldZ, size, seed) {
         const rng = (offset) => Utils.seededRandom(seed + offset);
+        let decorCount = 0;
+        const maxDecor = CONFIG.maxDecorationsPerChunk;
         
-        // Деревья
-        const numTrees = 5 + Math.floor(rng(200) * 15);
-        for (let i = 0; i < numTrees; i++) {
+        // Деревья (меньше)
+        const numTrees = 2 + Math.floor(rng(200) * 4);
+        for (let i = 0; i < numTrees && decorCount < maxDecor; i++) {
             const x = worldX + rng(210 + i) * size;
             const z = worldZ + rng(220 + i) * size;
             
             // Не ставить на дорогах
             const localX = x - worldX - size / 2;
             const localZ = z - worldZ - size / 2;
-            if (Math.abs(localZ) < 8 || (cx % 2 === 0 && Math.abs(localX) < 8)) continue;
+            if (Math.abs(localZ) < 10 || (cx % 3 === 0 && Math.abs(localX) < 10)) continue;
             
-            const tree = rng(230 + i) > 0.3 
-                ? DecorationFactory.createBirch() 
-                : DecorationFactory.createSpruce();
+            const tree = DecorationFactory.createSimpleTree();
             tree.position.set(x, 0, z);
-            tree.rotation.y = rng(240 + i) * Math.PI * 2;
             chunk.add(tree);
+            decorCount++;
         }
         
-        // Скамейки
-        const numBenches = Math.floor(rng(300) * 5);
-        for (let i = 0; i < numBenches; i++) {
-            const x = worldX + 10 + rng(310 + i) * (size - 20);
-            const z = worldZ + 10 + rng(320 + i) * (size - 20);
-            
-            const bench = DecorationFactory.createBench();
-            bench.position.set(x, 0, z);
-            bench.rotation.y = rng(330 + i) * Math.PI * 2;
-            chunk.add(bench);
+        // Фонари вдоль дорог (меньше)
+        for (let i = 0; i < size && decorCount < maxDecor; i += 40) {
+            const lamp = DecorationFactory.createStreetLamp();
+            lamp.position.set(worldX + i, 0, worldZ + size / 2 + 8);
+            chunk.add(lamp);
+            decorCount++;
         }
         
-        // Фонари вдоль дорог
-        for (let i = 0; i < size; i += 20) {
-            // Вдоль горизонтальной дороги
-            [-8, 8].forEach(offset => {
-                const lamp = DecorationFactory.createStreetLamp();
-                lamp.position.set(worldX + i, 0, worldZ + size / 2 + offset);
-                chunk.add(lamp);
-            });
-            
-            // Вдоль вертикальной дороги (если есть)
-            if (cx % 2 === 0) {
-                [-8, 8].forEach(offset => {
-                    const lamp = DecorationFactory.createStreetLamp();
-                    lamp.position.set(worldX + size / 2 + offset, 0, worldZ + i);
-                    lamp.rotation.y = Math.PI / 2;
-                    chunk.add(lamp);
-                });
-            }
-        }
-        
-        // Мусорки
-        const numBins = Math.floor(rng(400) * 4);
-        for (let i = 0; i < numBins; i++) {
-            const bin = DecorationFactory.createTrashBin();
-            bin.position.set(
-                worldX + 5 + rng(410 + i) * (size - 10),
-                0,
-                worldZ + 5 + rng(420 + i) * (size - 10)
-            );
-            chunk.add(bin);
-        }
-        
-        // Флаги
-        if (rng(450) > 0.6) {
+        // Флаг (редко)
+        if (rng(450) > 0.8 && decorCount < maxDecor) {
             const flag = DecorationFactory.createFlag();
-            flag.position.set(
-                worldX + 20 + rng(451) * 60,
-                0,
-                worldZ + 20 + rng(452) * 60
-            );
+            flag.position.set(worldX + 50, 0, worldZ + 50);
             chunk.add(flag);
-        }
-        
-        // Остановки
-        if (rng(460) > 0.7) {
-            const stop = DecorationFactory.createBusStop();
-            stop.position.set(
-                worldX + size / 2 + (rng(461) > 0.5 ? 12 : -12),
-                0,
-                worldZ + 20 + rng(462) * 60
-            );
-            stop.rotation.y = rng(461) > 0.5 ? 0 : Math.PI;
-            chunk.add(stop);
-        }
-        
-        // Памятник (редко)
-        if (rng(470) > 0.9) {
-            const monument = DecorationFactory.createMonument();
-            monument.position.set(
-                worldX + 30 + rng(471) * 40,
-                0,
-                worldZ + 30 + rng(472) * 40
-            );
-            chunk.add(monument);
+            decorCount++;
         }
     },
     
-    // Генерация транспорта
+    // Генерация транспорта (оптимизированная)
     generateVehicles(chunk, cx, cz, worldX, worldZ, size, seed) {
         const rng = (offset) => Utils.seededRandom(seed + offset);
-        const numVehicles = 1 + Math.floor(rng(600) * CONFIG.vehiclePerChunk * 2);
         
-        for (let i = 0; i < numVehicles; i++) {
-            const vehicle = VehicleFactory.createRandomVehicle();
+        // Только 1 машина на чанк
+        if (rng(600) > 0.5) {
+            const vehicle = VehicleFactory.createSimpleLada();
             
-            // Располагаем вдоль дорог
-            const alongX = rng(610 + i) > 0.5;
-            let x, z, rotation;
-            
-            if (alongX) {
-                x = worldX + 10 + rng(620 + i) * (size - 20);
-                z = worldZ + size / 2 + (rng(630 + i) > 0.5 ? 3 : -3);
-                rotation = rng(630 + i) > 0.5 ? 0 : Math.PI;
-            } else if (cx % 2 === 0) {
-                x = worldX + size / 2 + (rng(640 + i) > 0.5 ? 3 : -3);
-                z = worldZ + 10 + rng(650 + i) * (size - 20);
-                rotation = rng(640 + i) > 0.5 ? Math.PI / 2 : -Math.PI / 2;
-            } else {
-                // На парковке
-                x = worldX + 15 + rng(660 + i) * 30;
-                z = worldZ + 15 + rng(670 + i) * 30;
-                rotation = rng(680 + i) * Math.PI * 2;
-            }
+            const x = worldX + 20 + rng(620) * 60;
+            const z = worldZ + size / 2 + (rng(630) > 0.5 ? 4 : -4);
+            const rotation = rng(630) > 0.5 ? 0 : Math.PI;
             
             vehicle.position.set(x, 0, z);
             vehicle.rotation.y = rotation;
@@ -648,26 +562,21 @@ const WorldGenerator = {
         }
     },
     
-    // Генерация NPC
+    // Генерация NPC (оптимизированная)
     generateNPCs(chunk, cx, cz, worldX, worldZ, size, seed) {
         const rng = (offset) => Utils.seededRandom(seed + offset);
-        const numNPCs = CONFIG.npcPerChunk + Math.floor(rng(700) * 3);
         
-        for (let i = 0; i < numNPCs; i++) {
-            const npc = NPCFactory.createRandomNPC();
+        // Только 1 NPC на чанк (иногда 0)
+        if (rng(700) > 0.3) {
+            const npc = NPCFactory.createSimpleNPC();
             
-            // Располагаем на тротуарах и площадях
-            const x = worldX + 5 + rng(710 + i) * (size - 10);
-            const z = worldZ + 5 + rng(720 + i) * (size - 10);
+            const x = worldX + 20 + rng(710) * 60;
+            const z = worldZ + 20 + rng(720) * 60;
             
             npc.position.set(x, 0, z);
-            npc.rotation.y = rng(730 + i) * Math.PI * 2;
+            npc.rotation.y = rng(730) * Math.PI * 2;
             chunk.add(npc);
             GameState.npcs.push(npc);
-            
-            if (npc.userData.interactable) {
-                GameState.interactables.push(npc);
-            }
         }
     },
     
@@ -722,7 +631,7 @@ const WorldGenerator = {
         }
     },
     
-    // Выгрузка чанка
+    // Выгрузка чанка с очисткой памяти
     unloadChunk(key) {
         if (this.chunks.has(key)) {
             const chunk = this.chunks.get(key);
@@ -748,7 +657,34 @@ const WorldGenerator = {
                 if (iidx > -1) GameState.interactables.splice(iidx, 1);
             });
             
+            // Освобождаем память - удаляем геометрии и материалы
+            this.disposeChunk(chunk);
+            
             this.loadedChunks.delete(key);
+            this.chunks.delete(key); // Удаляем из кэша для освобождения памяти
+        }
+    },
+    
+    // Освобождение ресурсов чанка
+    disposeChunk(object) {
+        if (object.geometry) {
+            object.geometry.dispose();
+        }
+        
+        if (object.material) {
+            if (Array.isArray(object.material)) {
+                object.material.forEach(mat => {
+                    if (mat.map) mat.map.dispose();
+                    mat.dispose();
+                });
+            } else {
+                if (object.material.map) object.material.map.dispose();
+                object.material.dispose();
+            }
+        }
+        
+        if (object.children) {
+            object.children.forEach(child => this.disposeChunk(child));
         }
     },
     

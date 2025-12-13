@@ -696,5 +696,82 @@ const VehicleFactory = {
         }
         
         return this.createLada();
+    },
+    
+    // Упрощённая ЛАДА для оптимизации (меньше полигонов)
+    createSimpleLada() {
+        const car = new THREE.Group();
+        car.name = 'lada';
+        
+        // Используем кэшированные материалы
+        const bodyColor = [COLORS.ladaGreen, COLORS.ladaWhite, COLORS.ladaBlue, COLORS.ladaRed][Math.floor(Math.random() * 4)];
+        const bodyMat = this.getMaterial(bodyColor);
+        
+        // Кузов - один блок
+        const bodyGeom = new THREE.BoxGeometry(2.2, 1, 4.5);
+        const body = new THREE.Mesh(bodyGeom, bodyMat);
+        body.position.y = 0.7;
+        body.castShadow = true;
+        car.add(body);
+        
+        // Кабина - один блок
+        const cabinGeom = new THREE.BoxGeometry(2, 0.6, 2);
+        const cabin = new THREE.Mesh(cabinGeom, bodyMat);
+        cabin.position.set(0, 1.4, -0.2);
+        cabin.castShadow = true;
+        car.add(cabin);
+        
+        // Стёкла - только лобовое
+        const glassMat = this.getMaterial(0x87CEEB, { transparent: true, opacity: 0.6 });
+        const frontGlass = new THREE.Mesh(
+            new THREE.BoxGeometry(1.8, 0.5, 0.1),
+            glassMat
+        );
+        frontGlass.position.set(0, 1.35, 0.9);
+        car.add(frontGlass);
+        
+        // Колёса - упрощённые (цилиндры без деталей)
+        car.userData.wheels = [];
+        const wheelGeom = new THREE.CylinderGeometry(0.35, 0.35, 0.25, 8);
+        const wheelMat = this.getMaterial(0x222222);
+        
+        const wheelPositions = [
+            [-1.1, 0.35, 1.4],
+            [1.1, 0.35, 1.4],
+            [-1.1, 0.35, -1.4],
+            [1.1, 0.35, -1.4]
+        ];
+        
+        wheelPositions.forEach(pos => {
+            const wheel = new THREE.Mesh(wheelGeom, wheelMat);
+            wheel.rotation.z = Math.PI / 2;
+            wheel.position.set(...pos);
+            car.add(wheel);
+            car.userData.wheels.push(wheel);
+        });
+        
+        // Фары - упрощённые
+        const headlightMat = new THREE.MeshBasicMaterial({ color: 0xFFFFAA });
+        [-0.7, 0.7].forEach(x => {
+            const headlight = new THREE.Mesh(
+                new THREE.BoxGeometry(0.3, 0.15, 0.05),
+                headlightMat
+            );
+            headlight.position.set(x, 0.55, 2.26);
+            car.add(headlight);
+        });
+        
+        car.userData.type = 'vehicle';
+        car.userData.vehicleType = 'lada';
+        car.userData.fuel = 100;
+        car.userData.maxSpeed = CONFIG.carMaxSpeed;
+        car.userData.color = bodyColor;
+        car.userData.collision = {
+            width: 2.4,
+            depth: 4.8,
+            height: 2
+        };
+        
+        return car;
     }
-};
+    };
